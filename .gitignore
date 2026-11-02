@@ -1,0 +1,18 @@
+# Dependencias y build
+node_modules/
+dist/
+.astro/
+
+# Archivos pesados de desarrollo / Blender / Capturas locales (no requeridos en producción)
+*.blend
+*.blend1
+captures/
+previews/
+assets/
+img/
+.playwright-cli/
+.playwright-mcp/
+plan-camara-scroll.md
+CV_Luis_Monge.md
+.DS_Store
+Thumbs.db
