@@ -198,14 +198,14 @@ export class ChessScene {
       visMap.bust = 1;
       visMap.knight = 1;
       visMap.king = 1;
-    } else if (progress < 0.11) {
+    } else if (progress < 0.10) {
       // Transición Hero -> Acto 1 (Busto queda solo)
-      const tr = (progress - 0.05) / (0.11 - 0.05);
+      const tr = (progress - 0.05) / (0.10 - 0.05);
       visMap.bust = 1;
       visMap.knight = 1 - tr;
       visMap.king = 1 - tr;
-    } else if (progress >= 0.95) {
-      // Acto 7: Juego Completo (todas las piezas protagonistas activas)
+    } else if (progress >= 0.96) {
+      // Acto 8: Juego Completo (todas las piezas protagonistas activas)
       visMap.bust = 1;
       visMap.knight = 1;
       visMap.rook = 1;
@@ -213,24 +213,25 @@ export class ChessScene {
       visMap.queen = 1;
       visMap.king = 1;
       visMap.pawn = 1;
-    } else if (progress >= 0.90) {
-      // Transición Acto 6 (Rey) -> Acto 7 (Juego Completo)
-      const tr = (progress - 0.90) / (0.95 - 0.90);
-      visMap.king = 1;
+    } else if (progress >= 0.91) {
+      // Transición Acto 7 (Peón) -> Acto 8 (Juego Completo)
+      const tr = (progress - 0.91) / (0.96 - 0.91);
+      visMap.pawn = 1;
       visMap.bust = tr;
       visMap.knight = tr;
       visMap.rook = tr;
       visMap.bishop = tr;
       visMap.queen = tr;
-      visMap.pawn = tr;
+      visMap.king = tr;
     } else {
-      // Secuencia ordenada de piezas individuales en sus respectivos actos (1..6)
-      const SOLO_ORDER: HeroKey[] = ['bust', 'knight', 'rook', 'bishop', 'queen', 'king'];
+      // Secuencia ordenada de piezas individuales en sus respectivos actos (1..7)
+      // 1: bust, 2: knight, 3: rook, 4: bishop, 5: queen, 6: king, 7: pawn
+      const SOLO_ORDER: HeroKey[] = ['bust', 'knight', 'rook', 'bishop', 'queen', 'king', 'pawn'];
       let handled = false;
       for (let k = 0; k < SOLO_ORDER.length - 1; k++) {
-        const mid = (1 / 7) * (k + 1.5);
-        const start = mid - 0.028;
-        const end = mid + 0.028;
+        const mid = (1 / 8) * (k + 1.5);
+        const start = mid - 0.024;
+        const end = mid + 0.024;
         if (progress < start) {
           visMap[SOLO_ORDER[k]] = 1;
           handled = true;
@@ -244,7 +245,7 @@ export class ChessScene {
         }
       }
       if (!handled) {
-        visMap.king = 1;
+        visMap.pawn = 1;
       }
     }
 

@@ -29,7 +29,7 @@ export interface Keyframe {
 export const STATIONS_DESKTOP: Keyframe[] = [
   // 0. Hero: Tríada flotando ingrávida en tercio derecho, tablero centrado abajo
   {
-    progress: 0 / 7,
+    progress: 0 / 8,
     pos: [0.0, 0.34, 1.25],
     target: [0.0, 0.19, 0.10],
     fov: 28,
@@ -40,7 +40,7 @@ export const STATIONS_DESKTOP: Keyframe[] = [
   },
   // 1. Mármol: Macro frontal al Busto en tercio derecho (despejado)
   {
-    progress: 1 / 7,
+    progress: 1 / 8,
     pos: [-0.014, 0.28, 0.683],
     target: [-0.144, 0.162, 0.054],
     fov: 24,
@@ -51,7 +51,7 @@ export const STATIONS_DESKTOP: Keyframe[] = [
   },
   // 2. Caballo: Perfil 3/4 izquierdo en tercio derecho con brillo en crin
   {
-    progress: 2 / 7,
+    progress: 2 / 8,
     pos: [0.094, 0.28, 0.466],
     target: [-0.036, 0.132, -0.163],
     fov: 23,
@@ -62,7 +62,7 @@ export const STATIONS_DESKTOP: Keyframe[] = [
   },
   // 3. Torre: Enfoque frontal-alto a las almenas y porte arquitectónico
   {
-    progress: 3 / 7,
+    progress: 3 / 8,
     pos: [-0.123, 0.28, 0.576],
     target: [-0.253, 0.135, -0.054],
     fov: 23,
@@ -73,7 +73,7 @@ export const STATIONS_DESKTOP: Keyframe[] = [
   },
   // 4. Alfil: Enfoque afilado a la mitra y bisel diagonal en obsidiana
   {
-    progress: 4 / 7,
+    progress: 4 / 8,
     pos: [0.203, 0.28, 0.576],
     target: [0.073, 0.145, -0.054],
     fov: 23,
@@ -84,7 +84,7 @@ export const STATIONS_DESKTOP: Keyframe[] = [
   },
   // 5. Reina: Corona multifacética y presencia dominante en cristal
   {
-    progress: 5 / 7,
+    progress: 5 / 8,
     pos: [-0.014, 0.28, 0.793],
     target: [-0.144, 0.155, 0.163],
     fov: 23,
@@ -95,7 +95,7 @@ export const STATIONS_DESKTOP: Keyframe[] = [
   },
   // 6. Rey: Corona con cruz y clímax majestuoso dorado
   {
-    progress: 6 / 7,
+    progress: 6 / 8,
     pos: [0.094, 0.28, 0.683],
     target: [-0.036, 0.152, 0.054],
     fov: 23,
@@ -104,7 +104,18 @@ export const STATIONS_DESKTOP: Keyframe[] = [
     focusTarget: 'king',
     warmAccent: 0.85,
   },
-  // 7. Juego Completo: Plano cenital ~70° ortogonal con tablero a la derecha
+  // 7. El Peón: Enfoque rasante al peón de obsidiana en primera línea
+  {
+    progress: 7 / 8,
+    pos: [0.184, 0.25, 0.466],
+    target: [0.054, 0.112, -0.054],
+    fov: 23,
+    heroBlend: 1.0,
+    castOpacity: 0.0,
+    focusTarget: 'pawn',
+    warmAccent: 0.15,
+  },
+  // 8. Juego Completo: Plano cenital ~70° ortogonal con tablero a la derecha
   {
     progress: 1.000,
     pos: [-0.22, 1.48, 0.46],
@@ -118,13 +129,13 @@ export const STATIONS_DESKTOP: Keyframe[] = [
 ];
 
 /**
- * 8 Estaciones Maestras para Modo Responsive (Mobile / Tablet).
+ * 9 Estaciones Maestras para Modo Responsive (Mobile / Tablet).
  * Centran la pieza protagonista exactamente en el eje horizontal (ndcX ~ 0.0).
  */
 export const STATIONS_MOBILE: Keyframe[] = [
   // 0. Hero móvil: Tríada centrada simétricamente
   {
-    progress: 0 / 7,
+    progress: 0 / 8,
     pos: [0.0, 0.38, 1.45],
     target: [0.0, 0.20, 0.10],
     fov: 34,
@@ -135,7 +146,7 @@ export const STATIONS_MOBILE: Keyframe[] = [
   },
   // 1. Mármol móvil: Busto centrado
   {
-    progress: 1 / 7,
+    progress: 1 / 8,
     pos: [-0.079, 0.26, 0.68],
     target: [-0.079, 0.16, 0.054],
     fov: 27,
@@ -146,7 +157,7 @@ export const STATIONS_MOBILE: Keyframe[] = [
   },
   // 2. Caballo móvil: Caballo centrado
   {
-    progress: 2 / 7,
+    progress: 2 / 8,
     pos: [0.058, 0.26, 0.46],
     target: [0.058, 0.14, -0.163],
     fov: 26,
@@ -157,7 +168,7 @@ export const STATIONS_MOBILE: Keyframe[] = [
   },
   // 3. Torre móvil: Torre centrada
   {
-    progress: 3 / 7,
+    progress: 3 / 8,
     pos: [-0.163, 0.26, 0.576],
     target: [-0.163, 0.135, -0.054],
     fov: 26,
@@ -168,7 +179,7 @@ export const STATIONS_MOBILE: Keyframe[] = [
   },
   // 4. Alfil móvil: Alfil centrado
   {
-    progress: 4 / 7,
+    progress: 4 / 8,
     pos: [0.163, 0.26, 0.576],
     target: [0.163, 0.145, -0.054],
     fov: 26,
@@ -179,7 +190,7 @@ export const STATIONS_MOBILE: Keyframe[] = [
   },
   // 5. Reina móvil: Reina centrada
   {
-    progress: 5 / 7,
+    progress: 5 / 8,
     pos: [-0.054, 0.26, 0.793],
     target: [-0.054, 0.155, 0.163],
     fov: 26,
@@ -190,7 +201,7 @@ export const STATIONS_MOBILE: Keyframe[] = [
   },
   // 6. Rey móvil: Rey centrado
   {
-    progress: 6 / 7,
+    progress: 6 / 8,
     pos: [0.054, 0.26, 0.68],
     target: [0.054, 0.16, 0.054],
     fov: 26,
@@ -199,7 +210,18 @@ export const STATIONS_MOBILE: Keyframe[] = [
     focusTarget: 'king',
     warmAccent: 0.85,
   },
-  // 7. Juego Completo móvil: Tablero completo centrado
+  // 7. Peón móvil: Peón centrado
+  {
+    progress: 7 / 8,
+    pos: [0.054, 0.24, 0.46],
+    target: [0.054, 0.115, -0.054],
+    fov: 26,
+    heroBlend: 1.0,
+    castOpacity: 0.0,
+    focusTarget: 'pawn',
+    warmAccent: 0.15,
+  },
+  // 8. Juego Completo móvil: Tablero completo centrado
   {
     progress: 1.000,
     pos: [0.0, 1.65, 0.35],
@@ -216,12 +238,12 @@ export const STATIONS = STATIONS_DESKTOP;
 
 /**
  * Función de Remapeo con "Mesetas de Enfoque" (Dwell Plateaus).
- * Alrededor de cada una de las 8 estaciones el scroll desacelera
+ * Alrededor de cada una de las 9 estaciones el scroll desacelera
  * para que el usuario pueda contemplar la pieza y leer el texto.
  */
 export function remapProgressWithDwell(rawP: number): number {
   const p = THREE.MathUtils.clamp(rawP, 0, 1);
-  const stations = [0 / 7, 1 / 7, 2 / 7, 3 / 7, 4 / 7, 5 / 7, 6 / 7, 1.0];
+  const stations = [0 / 8, 1 / 8, 2 / 8, 3 / 8, 4 / 8, 5 / 8, 6 / 8, 7 / 8, 1.0];
   const halfWindow = 0.026; // ancho de la meseta
 
   for (let i = 0; i < stations.length; i++) {
