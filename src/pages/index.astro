@@ -545,44 +545,6 @@
       });
       (window as any).__lenis = lenis;
 
-      // Notificaciones de movimientos en el tablero
-      let lastMoveText = '';
-      chess.init().then(() => {
-        chess.boardInteraction?.onMove((e) => {
-          const desc = document.getElementById('board-hud-desc');
-          if (desc) {
-            const cap = e.capturedPieceId ? ' (Captura)' : '';
-            desc.textContent = `Movimiento: ${e.pieceKind.toUpperCase()} ${e.fromSquare} → ${e.toSquare}${cap}`;
-          }
-        });
-      });
-
-      const toggleBoardBtn = document.getElementById('toggle-board-btn');
-      const closeBoardBtn = document.getElementById('close-board-btn');
-      const resetBoardBtn = document.getElementById('reset-board-btn');
-      const boardHud = document.getElementById('board-hud');
-      const secCompletoContent = document.querySelector('#sec-completo .content-wrapper') as HTMLElement | null;
-
-      function setBoardFreeView(active: boolean) {
-        if (!chess.boardInteraction) return;
-        chess.boardInteraction.isFreeViewActive = active;
-        boardHud?.classList.toggle('active', active);
-        if (secCompletoContent) {
-          secCompletoContent.style.opacity = active ? '0' : '1';
-          secCompletoContent.style.pointerEvents = active ? 'none' : 'auto';
-          secCompletoContent.style.transform = active ? 'translateX(-40px)' : 'translateX(0)';
-          secCompletoContent.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-        }
-      }
-
-      toggleBoardBtn?.addEventListener('click', () => setBoardFreeView(true));
-      closeBoardBtn?.addEventListener('click', () => setBoardFreeView(false));
-      resetBoardBtn?.addEventListener('click', () => {
-        chess.boardInteraction?.resetPieces();
-        const desc = document.getElementById('board-hud-desc');
-        if (desc) desc.textContent = currentLang === 'es' ? 'Posición restablecida. Arrastra cualquier pieza para moverla.' : 'Position reset. Drag any piece to move it.';
-      });
-
       // Instanciar motor Three.js
       const params = new URLSearchParams(location.search);
       const chess = new ChessScene(canvas, { debug: params.has('debug') });
