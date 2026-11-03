@@ -424,15 +424,10 @@
           </p>
           <div class="tech-tag" data-i18n="s8_tag">LUIS MONGE · CIENCIA DE DATOS · ARQUITECTURA IA · SOFTWARE</div>
           <div class="cta-container">
-            <div class="final-actions-row">
-              <a href="mailto:monjeje2028@gmail.com" class="cta-button" id="cta-btn">
+            <a href="mailto:monjeje2028@gmail.com" class="cta-button" id="cta-btn">
               <span data-i18n="s8_cta">INICIAR CONVERSACIÓN</span>
               <span class="cta-arrow">→</span>
             </a>
-              <button type="button" class="cta-button cta-board-btn" id="toggle-board-btn">
-                <span data-i18n="s8_board_btn">♟ EXPLORAR TABLERO 3D</span>
-              </button>
-            </div>
             <div class="hero-links cta-links">
               <a
                 href="https://github.com/LuisMonGP"
@@ -454,27 +449,6 @@
           </div>
         </div>
       </section>
-    
-      <!-- HUD Flotante de Tablero 3D Interactivo -->
-      <div id="board-hud" class="board-hud" aria-hidden="true">
-        <div class="board-hud-panel">
-          <div class="board-hud-info">
-            <span class="board-hud-icon">♟</span>
-            <div class="board-hud-texts">
-              <span class="board-hud-title" data-i18n="board_hud_title">MODO PARTIDA · TABLERO INTERACTIVO</span>
-              <span class="board-hud-desc" id="board-hud-desc" data-i18n="board_hud_desc">Arrastra cualquier pieza para moverla sobre el tablero</span>
-            </div>
-          </div>
-          <div class="board-hud-actions">
-            <button type="button" class="hud-pill-btn" id="reset-board-btn" title="Reiniciar posición de las piezas">
-              <span data-i18n="board_hud_reset">↺ REINICIAR</span>
-            </button>
-            <button type="button" class="hud-pill-btn hud-pill-close" id="close-board-btn" title="Volver al cierre">
-              <span data-i18n="board_hud_close">✕ SALIR DEL MODO PARTIDA</span>
-            </button>
-          </div>
-        </div>
-      </div>
     </main>
 
     <!-- Indicador de Scroll Inferior Dinámico -->
@@ -695,11 +669,6 @@
             'Arquitectura sólida en la base, rigor científico en la diagonal, diseño versátil en el centro y liderazgo consciente en el núcleo. Has recorrido cada dimensión de mi trabajo; ahora que conoces mis piezas, <strong>¿iniciamos nuestra primera partida?</strong>',
           s8_tag: 'LUIS MONGE · CIENCIA DE DATOS · ARQUITECTURA IA · SOFTWARE',
           s8_cta: 'INICIAR CONVERSACIÓN',
-          s8_board_btn: '♟ EXPLORAR TABLERO 3D',
-          board_hud_title: 'MODO PARTIDA · TABLERO INTERACTIVO',
-          board_hud_desc: 'Arrastra cualquier pieza para moverla · Click derecho / arrastrar para rotar órbita 360°',
-          board_hud_reset: '↺ REINICIAR',
-          board_hud_close: '✕ SALIR DEL MODO PARTIDA',
           loader_label: 'CARGANDO TABLERO',
           loader_sub: 'OPTIMIZANDO PIEZAS & SHADERS',
         },
@@ -817,11 +786,6 @@
             'Solid architecture at the base, scientific rigor along the diagonal, versatile design at the center, and conscious leadership at the core. You have explored every dimension of my work; now that you know my pieces, <strong>shall we begin our first game?</strong>',
           s8_tag: 'LUIS MONGE · DATA SCIENCE · AI ARCHITECTURE · SOFTWARE',
           s8_cta: 'START A CONVERSATION',
-          s8_board_btn: '♟ EXPLORE 3D BOARD',
-          board_hud_title: 'MATCH MODE · INTERACTIVE BOARD',
-          board_hud_desc: 'Drag any piece to move it · Right-click / drag to rotate 360° orbit',
-          board_hud_reset: '↺ RESET',
-          board_hud_close: '✕ EXIT MATCH MODE',
           loader_label: 'LOADING BOARD',
           loader_sub: 'OPTIMIZING PIECES & SHADERS',
         },
@@ -879,21 +843,6 @@
           chess.start();
           loader.classList.add('done');
           requestAnimationFrame(() => lenis.resize());
-
-          if (chess.boardInteraction) {
-            chess.boardInteraction.onMove((event) => {
-              const name = PIECE_NAMES_ES[event.pieceKind] || event.pieceKind;
-              const capText = event.capturedPieceId
-                ? (currentLang === 'es' ? ' · ¡Pieza capturada!' : ' · Piece captured!')
-                : '';
-              if (boardHudDesc) {
-                boardHudDesc.textContent =
-                  currentLang === 'es'
-                    ? `Moviste ${name}: ${event.fromSquare.toUpperCase()} → ${event.toSquare.toUpperCase()}${capText}`
-                    : `Moved ${event.pieceKind}: ${event.fromSquare.toUpperCase()} → ${event.toSquare.toUpperCase()}${capText}`;
-              }
-            });
-          }
         })
         .catch((err) => {
           console.error('Error cargando Three.js:', err);
@@ -907,121 +856,6 @@
         requestAnimationFrame(raf);
       }
       requestAnimationFrame(raf);
-
-      // Controles de Tablero Interactivo & Modo Partida
-      const toggleBoardBtn = document.getElementById('toggle-board-btn') as HTMLButtonElement | null;
-      const boardHud = document.getElementById('board-hud') as HTMLElement | null;
-      const closeBoardBtn = document.getElementById('close-board-btn') as HTMLButtonElement | null;
-      const resetBoardBtn = document.getElementById('reset-board-btn') as HTMLButtonElement | null;
-      const boardHudDesc = document.getElementById('board-hud-desc') as HTMLElement | null;
-
-      const PIECE_NAMES_ES: Record<string, string> = {
-        pawn: 'Peón',
-        knight: 'Caballo',
-        bishop: 'Alfil',
-        rook: 'Torre',
-        queen: 'Reina',
-        king: 'Rey',
-        bust: 'Busto (Arquitecto)',
-      };
-
-      let isTransitioning = false;
-
-      function triggerLoaderTransition(
-        title: string,
-        subtitle: string,
-        duration: number,
-        action: () => void
-      ) {
-        if (isTransitioning) return;
-        isTransitioning = true;
-
-        const lbl = loader.querySelector('.loader-label');
-        const sub = loader.querySelector('.loader-sub');
-        if (lbl) lbl.textContent = title;
-        if (sub) sub.textContent = subtitle;
-
-        fill.style.transition = 'none';
-        fill.style.width = '0%';
-        loader.classList.remove('done');
-
-        requestAnimationFrame(() => {
-          fill.style.transition = `width ${Math.round(duration * 0.7)}ms ease-out`;
-          fill.style.width = '100%';
-        });
-
-        setTimeout(() => {
-          action();
-          setTimeout(() => {
-            loader.classList.add('done');
-            isTransitioning = false;
-          }, 180);
-        }, duration);
-      }
-
-      function enterGameMode() {
-        triggerLoaderTransition(
-          currentLang === 'es' ? 'CARGANDO MODO PARTIDA' : 'LOADING MATCH MODE',
-          currentLang === 'es' ? 'ACTIVANDO TABLERO INTERACTIVO...' : 'ACTIVATING INTERACTIVE BOARD...',
-          420,
-          () => {
-            chess.boardInteraction?.enable();
-            document.body.classList.add('board-game-active');
-            boardHud?.classList.add('active');
-            lenis.stop();
-            if (boardHudDesc) {
-              boardHudDesc.textContent =
-                currentLang === 'es'
-                  ? 'Arrastra cualquier pieza para moverla sobre el tablero'
-                  : 'Drag any piece to move it across the board';
-            }
-          }
-        );
-      }
-
-      function exitGameMode() {
-        triggerLoaderTransition(
-          currentLang === 'es' ? 'VOLVIENDO AL PORTAFOLIO' : 'RETURNING TO PORTFOLIO',
-          currentLang === 'es' ? 'REANUDANDO NAVEGACIÓN...' : 'RESUMING BROWSING...',
-          350,
-          () => {
-            chess.boardInteraction?.disable();
-            document.body.classList.remove('board-game-active');
-            boardHud?.classList.remove('active');
-            lenis.start();
-          }
-        );
-      }
-
-      if (toggleBoardBtn) {
-        toggleBoardBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          enterGameMode();
-        });
-      }
-
-      if (closeBoardBtn) {
-        closeBoardBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          exitGameMode();
-        });
-      }
-
-      if (resetBoardBtn) {
-        resetBoardBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          chess.boardInteraction?.resetPieces();
-          if (boardHudDesc) {
-            boardHudDesc.textContent =
-              currentLang === 'es'
-                ? 'Posiciones reiniciadas. Arrastra cualquier pieza para jugar.'
-                : 'Positions reset. Drag any piece to play.';
-          }
-        });
-      }
 
       // Evento de scroll
       lenis.on('scroll', ({ progress }: { progress: number }) => {
@@ -1122,7 +956,7 @@
         overflow-x: hidden;
       }
 
-      /* Canvas 3D Fijo de Fondo (Inerte por defecto: cero lag y 100% FPS en scroll) */
+      /* Canvas 3D Fijo de Fondo */
       #scene {
         position: fixed;
         inset: 0;
@@ -1131,11 +965,6 @@
         display: block;
         z-index: 1;
         pointer-events: none;
-        touch-action: none;
-      }
-
-      body.board-game-active #scene {
-        pointer-events: auto;
       }
 
       /* Monograma Iniciales Flotante Superior Izquierdo (LM) */
@@ -1262,28 +1091,7 @@
       .story-section.active {
         opacity: 1;
         transform: translateY(0);
-        pointer-events: none;
-      }
-
-      /* Solo permitir interacción en los contenidos interactivos */
-      .story-section.active .content-wrapper,
-      .story-section.active a,
-      .story-section.active button,
-      .story-section.active input {
         pointer-events: auto;
-      }
-
-      body.board-game-active .story-section {
-        opacity: 0 !important;
-        pointer-events: none !important;
-        transition: opacity 0.4s ease;
-      }
-
-      body.board-game-active .scroll-indicator,
-      body.board-game-active .lang-toggle-btn,
-      body.board-game-active .brand-logo-btn {
-        opacity: 0.22;
-        transition: opacity 0.4s ease;
       }
 
       .content-wrapper {
@@ -1778,122 +1586,6 @@
         text-transform: uppercase;
         color: #64748b;
         padding-top: 4px;
-      }
-
-      /* Estilos para el Tablero 3D Interactivo & HUD */
-      .final-actions-row {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-
-      .cta-board-btn {
-        background: rgba(56, 189, 248, 0.08);
-        border-color: rgba(56, 189, 248, 0.28);
-        color: #38bdf8;
-        cursor: pointer;
-      }
-
-      .cta-board-btn:hover {
-        background: rgba(56, 189, 248, 0.18);
-        border-color: rgba(56, 189, 248, 0.55);
-        box-shadow: 0 8px 24px rgba(56, 189, 248, 0.25);
-      }
-
-      .board-hud {
-        position: fixed;
-        bottom: 24px;
-        left: 50%;
-        transform: translateX(-50%) translateY(40px);
-        opacity: 0;
-        pointer-events: none;
-        z-index: 80;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-      }
-
-      .board-hud.active {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateX(-50%) translateY(0);
-      }
-
-      .board-hud-panel {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        background: rgba(7, 9, 14, 0.88);
-        border: 1px solid rgba(56, 189, 248, 0.35);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        padding: 12px 20px;
-        border-radius: 9999px;
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(56, 189, 248, 0.15);
-      }
-
-      .board-hud-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .board-hud-icon {
-        font-size: 1.4rem;
-        color: #38bdf8;
-      }
-
-      .board-hud-texts {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .board-hud-title {
-        font-family: 'Inter', monospace;
-        font-size: 0.68rem;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        color: #38bdf8;
-      }
-
-      .board-hud-desc {
-        font-size: 0.74rem;
-        color: #cbd5e1;
-      }
-
-      .board-hud-actions {
-        display: flex;
-        gap: 8px;
-      }
-
-      .hud-pill-btn {
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        color: #f1f5f9;
-        font-family: 'Inter', monospace;
-        font-size: 0.70rem;
-        font-weight: 600;
-        padding: 6px 14px;
-        border-radius: 9999px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .hud-pill-btn:hover {
-        background: rgba(255, 255, 255, 0.14);
-        border-color: #38bdf8;
-        color: #ffffff;
-      }
-
-      .hud-pill-close {
-        background: rgba(239, 68, 68, 0.12);
-        border-color: rgba(239, 68, 68, 0.35);
-        color: #fca5a5;
-      }
-
-      .hud-pill-close:hover {
-        background: rgba(239, 68, 68, 0.25);
-        border-color: #ef4444;
-        color: #ffffff;
       }
 
       /* Botón CTA Sección Final */
