@@ -365,11 +365,8 @@ export class ChessScene {
         // Parallax orbital interactivo reactivo al ratón
         this.mouseSmooth.lerp(this.mouse, 0.08);
         const right = new THREE.Vector3().subVectors(this.cameraTarget, this.basePos).cross(this.camera.up).normalize();
-        if (this.boardInteraction && this.boardInteraction.isFreeViewActive) {
-          const r = 1.82;
-          const az = this.boardInteraction.orbitAngles.azimuth;
-          const el = this.boardInteraction.orbitAngles.elevation + 0.98;
-          this.camera.position.set(r * Math.sin(az) * Math.cos(el), r * Math.sin(el), r * Math.cos(az) * Math.cos(el));
+        if (this.boardInteraction && this.boardInteraction.isGameModeActive) {
+          this.camera.position.copy(this.basePos);
         } else {
           this.camera.position.copy(this.basePos).addScaledVector(right, this.mouseSmooth.x * 0.028).addScaledVector(this.camera.up, -this.mouseSmooth.y * 0.018);
         }
