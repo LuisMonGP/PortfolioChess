@@ -879,6 +879,21 @@
           chess.start();
           loader.classList.add('done');
           requestAnimationFrame(() => lenis.resize());
+
+          if (chess.boardInteraction) {
+            chess.boardInteraction.onMove((event) => {
+              const name = PIECE_NAMES_ES[event.pieceKind] || event.pieceKind;
+              const capText = event.capturedPieceId
+                ? (currentLang === 'es' ? ' · ¡Pieza capturada!' : ' · Piece captured!')
+                : '';
+              if (boardHudDesc) {
+                boardHudDesc.textContent =
+                  currentLang === 'es'
+                    ? `Moviste ${name}: ${event.fromSquare.toUpperCase()} → ${event.toSquare.toUpperCase()}${capText}`
+                    : `Moved ${event.pieceKind}: ${event.fromSquare.toUpperCase()} → ${event.toSquare.toUpperCase()}${capText}`;
+              }
+            });
+          }
         })
         .catch((err) => {
           console.error('Error cargando Three.js:', err);
@@ -892,6 +907,72 @@
         requestAnimationFrame(raf);
       }
       requestAnimationFrame(raf);
+
+      // Controles de Tablero Interactivo & Modo Partida
+      const toggleBoardBtn = document.getElementById('toggle-board-btn') as HTMLButtonElement | null;
+      const boardHud = document.getElementById('board-hud') as HTMLElement | null;
+      const closeBoardBtn = document.getElementById('close-board-btn') as HTMLButtonElement | null;
+      const resetBoardBtn = document.getElementById('reset-board-btn') as HTMLButtonElement | null;
+      const boardHudDesc = document.getElementById('board-hud-desc') as HTMLElement | null;
+
+      const PIECE_NAMES_ES: Record<string, string> = {
+        pawn: 'Peón',
+        knight: 'Caballo',
+        bishop: 'Alfil',
+        rook: 'Torre',
+        queen: 'Reina',
+        king: 'Rey',
+        bust: 'Busto (Arquitecto)',
+      };
+
+      function setFreeView(active: boolean) {
+        if (!chess.boardInteraction) return;
+        chess.boardInteraction.isFreeViewActive = active;
+        document.body.classList.toggle('board-free-view', active);
+        boardHud?.classList.toggle('active', active);
+
+        if (active) {
+          lenis.stop();
+          if (boardHudDesc) {
+            boardHudDesc.textContent =
+              currentLang === 'es'
+                ? 'Arrastra cualquier pieza para moverla · Click derecho para rotar órbita 360°'
+                : 'Drag any piece to move it · Right-click to rotate 360° orbit';
+          }
+        } else {
+          lenis.start();
+        }
+      }
+
+      if (toggleBoardBtn) {
+        toggleBoardBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setFreeView(true);
+        });
+      }
+
+      if (closeBoardBtn) {
+        closeBoardBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setFreeView(false);
+        });
+      }
+
+      if (resetBoardBtn) {
+        resetBoardBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          chess.boardInteraction?.resetPieces();
+          if (boardHudDesc) {
+            boardHudDesc.textContent =
+              currentLang === 'es'
+                ? 'Posiciones reiniciadas. Arrastra cualquier pieza para jugar.'
+                : 'Positions reset. Drag any piece to play.';
+          }
+        });
+      }
 
       // Evento de scroll
       lenis.on('scroll', ({ progress }: { progress: number }) => {
@@ -1000,7 +1081,8 @@
         height: 100vh;
         display: block;
         z-index: 1;
-        pointer-events: none;
+        pointer-events: auto;
+        touch-action: none;
       }
 
       /* Monograma Iniciales Flotante Superior Izquierdo (LM) */
@@ -1127,7 +1209,28 @@
       .story-section.active {
         opacity: 1;
         transform: translateY(0);
+        pointer-events: none;
+      }
+
+      /* Solo permitir interacción en los contenidos interactivos */
+      .story-section.active .content-wrapper,
+      .story-section.active a,
+      .story-section.active button,
+      .story-section.active input {
         pointer-events: auto;
+      }
+
+      body.board-free-view .story-section {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transition: opacity 0.4s ease;
+      }
+
+      body.board-free-view .scroll-indicator,
+      body.board-free-view .lang-toggle-btn,
+      body.board-free-view .brand-logo-btn {
+        opacity: 0.22;
+        transition: opacity 0.4s ease;
       }
 
       .content-wrapper {

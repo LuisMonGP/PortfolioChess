@@ -263,6 +263,11 @@ export class ChessScene {
       g.visible = vis > 0.005;
       if (!g.visible) return;
 
+      // Si la pieza está siendo arrastrada por el usuario, respetar el arrastre
+      if (this.boardInteraction && this.boardInteraction.getSelectedPiece() === g) {
+        return;
+      }
+
       // Caída recta: las piezas descienden verticalmente aplomadas
       const bob = Math.sin(t * 0.9 + i * 2.1) * 0.008 * (1 - b);
       const sway = Math.sin(t * 0.5 + i * 1.3) * 0.035 * (1 - b);

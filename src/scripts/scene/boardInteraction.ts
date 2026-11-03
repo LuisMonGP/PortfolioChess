@@ -53,11 +53,28 @@ export class BoardInteraction {
     this.bindEvents();
   }
 
+  public getSelectedPiece(): THREE.Group | null {
+    return this.selectedPiece;
+  }
+
+  public isPieceDragging(): boolean {
+    return this.isDragging;
+  }
+
   onMove(callback: (event: MoveEvent) => void) {
     this.onMoveCallback = callback;
   }
 
-  private updateRaycaster(event: MouseEvent | Touch) {
+  private isPieceVisible(p: THREE.Group): boolean {
+    let curr: THREE.Object3D | null = p;
+    while (curr) {
+      if (!curr.visible) return false;
+      curr = curr.parent;
+    }
+    return true;
+  }
+
+  private updateRaycaster(event: MouseEvent | Touch | PointerEvent) {
     const rect = this.domElement.getBoundingClientRect();
     this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -76,42 +93,54 @@ export class BoardInteraction {
     return null;
   }
 
+  private onContextMenu = (e: MouseEvent) => {
+    e.preventDefault();
+  };
+
   private bindEvents() {
     this.domElement.addEventListener('pointerdown', this.onPointerDown);
+    this.domElement.addEventListener('contextmenu', this.onContextMenu);
     window.addEventListener('pointermove', this.onPointerMove);
     window.addEventListener('pointerup', this.onPointerUp);
   }
 
   private onPointerDown = (e: PointerEvent) => {
-    // Si se pulsa con botón secundario o si está en vista libre sobre el fondo, orbitar
+    // Si se pulsa con botón secundario (derecho) o en vista libre sobre el fondo vacío: orbitar
     if (e.button === 2 || (this.isFreeViewActive && e.button === 0 && !this.hoveredPiece)) {
       this.isOrbiting = true;
       this.previousMousePosition = { x: e.clientX, y: e.clientY };
+      this.domElement.style.cursor = 'grabbing';
+      try {
+        this.domElement.setPointerCapture(e.pointerId);
+      } catch {}
       return;
     }
 
-    if (e.button !== 0) return; // Solo clic izquierdo para mover piezas
+    if (e.button !== 0) return; // Solo clic primario para arrastrar piezas
 
     this.updateRaycaster(e);
-    const pieceMeshes = this.getPieces().map((p) => p.children[0]).filter(Boolean);
-    const intersects = this.raycaster.intersectObjects(pieceMeshes, true);
+    const visiblePieces = this.getPieces().filter((p) => this.isPieceVisible(p));
+    const intersects = this.raycaster.intersectObjects(visiblePieces, true);
 
     if (intersects.length > 0) {
       const piece = this.getPieceFromIntersect(intersects[0]);
-      if (piece && piece.visible) {
+      if (piece && this.isPieceVisible(piece)) {
         this.selectedPiece = piece;
         this.isDragging = true;
         this.domElement.style.cursor = 'grabbing';
+        try {
+          this.domElement.setPointerCapture(e.pointerId);
+        } catch {}
 
         if (this.raycaster.ray.intersectPlane(this.plane, this.planeIntersect)) {
           this.dragOffset.copy(piece.position).sub(this.planeIntersect);
         }
 
-        // Elevar la pieza 3.5 cm
-        this.selectedPiece.position.y = BOARD.topY + 0.038;
+        // Elevar la pieza 4 cm
+        this.selectedPiece.position.y = BOARD.topY + 0.04;
 
-        // Mostrar casilla actual iluminada
-        (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.55;
+        // Mostrar casilla actual iluminada en dorado
+        (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.65;
         (this.highlightMesh.material as THREE.MeshBasicMaterial).color.setHex(0xe0ad50); // Oro
         this.highlightMesh.position.x = piece.position.x;
         this.highlightMesh.position.z = piece.position.z;
@@ -125,11 +154,11 @@ export class BoardInteraction {
       const deltaY = e.clientY - this.previousMousePosition.y;
       this.previousMousePosition = { x: e.clientX, y: e.clientY };
 
-      this.orbitAngles.azimuth -= deltaX * 0.006;
+      this.orbitAngles.azimuth -= deltaX * 0.0055;
       this.orbitAngles.elevation = THREE.MathUtils.clamp(
-        this.orbitAngles.elevation + deltaY * 0.005,
-        -0.25,
-        0.55
+        this.orbitAngles.elevation + deltaY * 0.0045,
+        -0.3,
+        0.55,
       );
       return;
     }
@@ -148,26 +177,26 @@ export class BoardInteraction {
           const [hx, hz] = square(sq);
           this.highlightMesh.position.x = hx;
           this.highlightMesh.position.z = hz;
-          (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.65;
+          (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.7;
           (this.highlightMesh.material as THREE.MeshBasicMaterial).color.setHex(0x38bdf8); // Cian
         } else {
-          (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.15;
+          (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.2;
         }
       }
       return;
     }
 
-    // Hover detection sobre piezas
-    const pieceMeshes = this.getPieces().map((p) => p.children[0]).filter(Boolean);
-    const intersects = this.raycaster.intersectObjects(pieceMeshes, true);
+    // Hover detection sobre piezas visibles
+    const visiblePieces = this.getPieces().filter((p) => this.isPieceVisible(p));
+    const intersects = this.raycaster.intersectObjects(visiblePieces, true);
 
     if (intersects.length > 0) {
       const piece = this.getPieceFromIntersect(intersects[0]);
-      if (piece && piece.visible) {
+      if (piece && this.isPieceVisible(piece)) {
         if (this.hoveredPiece !== piece) {
           this.hoveredPiece = piece;
           this.domElement.style.cursor = 'grab';
-          (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.35;
+          (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.4;
           (this.highlightMesh.material as THREE.MeshBasicMaterial).color.setHex(0x38bdf8);
           this.highlightMesh.position.x = piece.position.x;
           this.highlightMesh.position.z = piece.position.z;
@@ -183,9 +212,16 @@ export class BoardInteraction {
     }
   };
 
-  private onPointerUp = () => {
+  private onPointerUp = (e?: PointerEvent) => {
+    if (e && e.pointerId !== undefined) {
+      try {
+        this.domElement.releasePointerCapture(e.pointerId);
+      } catch {}
+    }
+
     if (this.isOrbiting) {
       this.isOrbiting = false;
+      this.domElement.style.cursor = 'default';
     }
 
     if (!this.isDragging || !this.selectedPiece) {
@@ -199,7 +235,7 @@ export class BoardInteraction {
 
     // Identificar casilla destino
     const targetSq = coordsToSquare(piece.position.x, piece.position.z);
-    const fromSq = piece.userData.square || 'e4';
+    const fromSq = piece.userData.square || piece.userData.initialSquare || 'e4';
 
     if (targetSq && targetSq !== fromSq) {
       const [snapX, snapZ] = square(targetSq);
@@ -208,8 +244,8 @@ export class BoardInteraction {
       let capturedId: string | undefined;
       const pieces = this.getPieces();
       for (const other of pieces) {
-        if (other !== piece && other.visible && other.userData.square === targetSq) {
-          // Captura: ocultar y desvanecer
+        if (other !== piece && this.isPieceVisible(other) && other.userData.square === targetSq) {
+          // Captura: ocultar la pieza capturada
           other.visible = false;
           capturedId = other.name;
           break;
@@ -233,7 +269,7 @@ export class BoardInteraction {
       });
 
       // Pulso luminoso de aterrizaje
-      (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.8;
+      (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.85;
       (this.highlightMesh.material as THREE.MeshBasicMaterial).color.setHex(0xe0ad50);
       this.highlightMesh.position.x = snapX;
       this.highlightMesh.position.z = snapZ;
@@ -242,8 +278,9 @@ export class BoardInteraction {
         (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.0;
       }, 700);
     } else {
-      // Si soltó fuera del tablero o en la misma casilla, regresa suavemente a su casilla previa
-      const [homeX, homeZ] = square(fromSq);
+      // Si soltó fuera del tablero o en la misma casilla, regresa a su casilla
+      const returnSq = fromSq;
+      const [homeX, homeZ] = square(returnSq);
       piece.position.set(homeX, BOARD.topY, homeZ);
       (this.highlightMesh.material as THREE.MeshBasicMaterial).opacity = 0.0;
     }
@@ -269,6 +306,7 @@ export class BoardInteraction {
 
   dispose() {
     this.domElement.removeEventListener('pointerdown', this.onPointerDown);
+    this.domElement.removeEventListener('contextmenu', this.onContextMenu);
     window.removeEventListener('pointermove', this.onPointerMove);
     window.removeEventListener('pointerup', this.onPointerUp);
     this.scene.remove(this.highlightMesh);
