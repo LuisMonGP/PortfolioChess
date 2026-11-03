@@ -33,7 +33,6 @@
       title="Luis Monge — Inicio"
     >
       <span class="brand-monogram">LM</span>
-      <span class="brand-dot"></span>
     </button>
 
     <!-- Selector de Idioma Flotante Superior Derecho (ES / EN) -->
@@ -1017,7 +1016,7 @@
         pointer-events: none;
       }
 
-      /* Monograma Iniciales Flotante Superior Izquierdo (LM) */
+      /* Monograma Iniciales Flotante Superior Izquierdo (LM) — Tipográfico puro sin píldora/tag */
       .brand-logo-btn {
         position: fixed;
         top: 26px;
@@ -1027,39 +1026,28 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 5px;
-        padding: 7px 14px;
-        border-radius: 9999px;
-        background: rgba(10, 14, 22, 0.65);
-        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: transparent;
+        border: none;
+        padding: 0;
         color: #f8fafc;
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+        transition: opacity 0.25s ease, transform 0.25s ease;
       }
 
       .brand-logo-btn:hover {
-        background: rgba(255, 255, 255, 0.12);
-        border-color: rgba(147, 197, 253, 0.45);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 14px var(--glass-glow);
+        background: transparent;
+        border-color: transparent;
+        box-shadow: none;
+        opacity: 0.72;
+        transform: translateY(-1px);
       }
 
       .brand-monogram {
         font-family: 'Cinzel', 'Playfair Display', serif;
-        font-size: 0.84rem;
+        font-size: 0.94rem;
         font-weight: 600;
-        letter-spacing: 0.14em;
+        letter-spacing: 0.16em;
         color: #f8fafc;
-        text-shadow: 0 0 12px rgba(147, 197, 253, 0.35);
-      }
-
-      .brand-dot {
-        width: 5px;
-        height: 5px;
-        border-radius: 50%;
-        background: var(--accent-blue);
-        box-shadow: 0 0 8px var(--accent-blue);
+        text-shadow: 0 0 14px rgba(147, 197, 253, 0.30);
       }
 
       /* Selector de Idioma Flotante Superior Derecho */
@@ -2172,13 +2160,15 @@
         }
 
         .brand-logo-btn {
-          top: 16px;
-          left: 16px;
-          padding: 6px 12px;
+          top: 18px;
+          left: 20px;
+          padding: 0;
+          background: transparent;
+          border: none;
         }
 
         .brand-monogram {
-          font-size: 0.76rem;
+          font-size: 0.84rem;
         }
 
         .lang-toggle-btn {
