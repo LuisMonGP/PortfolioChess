@@ -6,6 +6,7 @@ import { DustField, createFloor } from './atmosphere';
 import { PostFX } from './postfx';
 import { PieceFactory, loadAssets } from './pieces';
 import { ScrollTrack, type CameraState } from './scrollTrack';
+import { BoardInteraction, type MoveEvent } from './boardInteraction';
 
 type HeroKey = keyof typeof HEROES;
 
@@ -44,6 +45,7 @@ export class ChessScene {
   rig!: Rig;
   post!: PostFX;
   dust = new DustField(380);
+  boardInteraction!: BoardInteraction;
   controls?: OrbitControls;
   scrollTrack = new ScrollTrack();
 
@@ -102,6 +104,9 @@ export class ChessScene {
     SUPPORTING_CAST.forEach((p) => this.cast.add(factory.create(p)));
     this.scene.add(this.cast);
     this.cast.visible = false;
+
+    const getAllPieces = () => [...Object.values(this.heroes), ...this.cast.children] as THREE.Group[];
+    this.boardInteraction = new BoardInteraction(this.scene, this.camera, this.canvas, getAllPieces);
 
     this.scene.add(this.dust.points);
 
@@ -324,6 +329,7 @@ export class ChessScene {
     this.cast.visible = state.castOpacity > 0.02;
 
     this.rig.warm.intensity = THREE.MathUtils.lerp(this.rig.warm.intensity, state.warmAccent * 0.8, immediate ? 1 : 0.08);
+    if (this.scene.fog instanceof THREE.FogExp2) { const targetFog = p >= 0.94 ? 0.22 : LOOK.fogDensity; this.scene.fog.density = THREE.MathUtils.lerp(this.scene.fog.density, targetFog, immediate ? 1 : 0.06); }
     this.dust.uniforms.uWarm.value = THREE.MathUtils.lerp(this.dust.uniforms.uWarm.value, state.warmAccent, immediate ? 1 : 0.08);
 
     const t = this.clock.getElapsedTime();
@@ -332,7 +338,7 @@ export class ChessScene {
 
   private updateFocusAndAperture() {
     const focus = this.focusDistance();
-    const aperture = this.currentFocusTarget === 'board' ? 0.003 : 0.013;
+    const aperture = this.currentFocusTarget === 'board' ? 0.0008 : 0.013;
     this.post.setFocus(focus, aperture);
     return focus;
   }
@@ -354,10 +360,14 @@ export class ChessScene {
         // Parallax orbital interactivo reactivo al ratón
         this.mouseSmooth.lerp(this.mouse, 0.08);
         const right = new THREE.Vector3().subVectors(this.cameraTarget, this.basePos).cross(this.camera.up).normalize();
-        this.camera.position
-          .copy(this.basePos)
-          .addScaledVector(right, this.mouseSmooth.x * 0.028)
-          .addScaledVector(this.camera.up, -this.mouseSmooth.y * 0.018);
+        if (this.boardInteraction && this.boardInteraction.isFreeViewActive) {
+          const r = 1.82;
+          const az = this.boardInteraction.orbitAngles.azimuth;
+          const el = this.boardInteraction.orbitAngles.elevation + 0.98;
+          this.camera.position.set(r * Math.sin(az) * Math.cos(el), r * Math.sin(el), r * Math.cos(az) * Math.cos(el));
+        } else {
+          this.camera.position.copy(this.basePos).addScaledVector(right, this.mouseSmooth.x * 0.028).addScaledVector(this.camera.up, -this.mouseSmooth.y * 0.018);
+        }
         this.camera.lookAt(this.cameraTarget);
       }
 
@@ -372,6 +382,7 @@ export class ChessScene {
     cancelAnimationFrame(this.raf);
     window.removeEventListener('resize', this.resize);
     window.removeEventListener('pointermove', this.onPointer);
+    this.boardInteraction?.dispose();
     this.controls?.dispose();
     this.renderer.dispose();
   }

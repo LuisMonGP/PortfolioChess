@@ -173,6 +173,9 @@ export class PieceFactory {
     g.rotation.y = p.yaw ?? 0;
     g.userData.home = { position: g.position.clone(), rotation: g.rotation.clone() };
     g.userData.kind = p.kind;
+    g.userData.square = p.square;
+    g.userData.initialSquare = p.square;
+    g.userData.material = p.material;
     return g;
   }
 }

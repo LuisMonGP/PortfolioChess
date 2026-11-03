@@ -118,9 +118,9 @@ export const STATIONS_DESKTOP: Keyframe[] = [
   // 8. Juego Completo: Plano cenital ~70° ortogonal con tablero a la derecha
   {
     progress: 1.000,
-    pos: [-0.22, 1.48, 0.46],
-    target: [-0.22, 0.08, -0.04],
-    fov: 28,
+    pos: [-0.25, 1.58, 0.82],
+    target: [-0.22, 0.06, -0.02],
+    fov: 30,
     heroBlend: 1.0,
     castOpacity: 1.0,
     focusTarget: 'board',
@@ -224,9 +224,9 @@ export const STATIONS_MOBILE: Keyframe[] = [
   // 8. Juego Completo móvil: Tablero completo centrado
   {
     progress: 1.000,
-    pos: [0.0, 1.65, 0.35],
-    target: [0.0, 0.08, 0.0],
-    fov: 34,
+    pos: [0.0, 1.78, 0.68],
+    target: [0.0, 0.06, 0.0],
+    fov: 35,
     heroBlend: 1.0,
     castOpacity: 1.0,
     focusTarget: 'board',

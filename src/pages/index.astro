@@ -424,10 +424,15 @@
           </p>
           <div class="tech-tag" data-i18n="s8_tag">LUIS MONGE · CIENCIA DE DATOS · ARQUITECTURA IA · SOFTWARE</div>
           <div class="cta-container">
-            <a href="mailto:monjeje2028@gmail.com" class="cta-button" id="cta-btn">
+            <div class="final-actions-row">
+              <a href="mailto:monjeje2028@gmail.com" class="cta-button" id="cta-btn">
               <span data-i18n="s8_cta">INICIAR CONVERSACIÓN</span>
               <span class="cta-arrow">→</span>
             </a>
+              <button type="button" class="cta-button cta-board-btn" id="toggle-board-btn">
+                <span data-i18n="s8_board_btn">♟ EXPLORAR TABLERO 3D</span>
+              </button>
+            </div>
             <div class="hero-links cta-links">
               <a
                 href="https://github.com/LuisMonGP"
@@ -449,6 +454,27 @@
           </div>
         </div>
       </section>
+    
+      <!-- HUD Flotante de Tablero 3D Interactivo -->
+      <div id="board-hud" class="board-hud" aria-hidden="true">
+        <div class="board-hud-panel">
+          <div class="board-hud-info">
+            <span class="board-hud-icon">♟</span>
+            <div class="board-hud-texts">
+              <span class="board-hud-title" data-i18n="board_hud_title">MODO PARTIDA · TABLERO INTERACTIVO</span>
+              <span class="board-hud-desc" id="board-hud-desc" data-i18n="board_hud_desc">Arrastra cualquier pieza para moverla · Click derecho para rotar órbita 360°</span>
+            </div>
+          </div>
+          <div class="board-hud-actions">
+            <button type="button" class="hud-pill-btn" id="reset-board-btn" title="Reiniciar posición de las piezas">
+              <span data-i18n="board_hud_reset">↺ REINICIAR</span>
+            </button>
+            <button type="button" class="hud-pill-btn hud-pill-close" id="close-board-btn" title="Volver al cierre">
+              <span data-i18n="board_hud_close">✕ CERRAR VISTA LIBRE</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </main>
 
     <!-- Indicador de Scroll Inferior Dinámico -->
@@ -518,6 +544,44 @@
         touchMultiplier: 1.5,
       });
       (window as any).__lenis = lenis;
+
+      // Notificaciones de movimientos en el tablero
+      let lastMoveText = '';
+      chess.init().then(() => {
+        chess.boardInteraction?.onMove((e) => {
+          const desc = document.getElementById('board-hud-desc');
+          if (desc) {
+            const cap = e.capturedPieceId ? ' (Captura)' : '';
+            desc.textContent = `Movimiento: ${e.pieceKind.toUpperCase()} ${e.fromSquare} → ${e.toSquare}${cap}`;
+          }
+        });
+      });
+
+      const toggleBoardBtn = document.getElementById('toggle-board-btn');
+      const closeBoardBtn = document.getElementById('close-board-btn');
+      const resetBoardBtn = document.getElementById('reset-board-btn');
+      const boardHud = document.getElementById('board-hud');
+      const secCompletoContent = document.querySelector('#sec-completo .content-wrapper') as HTMLElement | null;
+
+      function setBoardFreeView(active: boolean) {
+        if (!chess.boardInteraction) return;
+        chess.boardInteraction.isFreeViewActive = active;
+        boardHud?.classList.toggle('active', active);
+        if (secCompletoContent) {
+          secCompletoContent.style.opacity = active ? '0' : '1';
+          secCompletoContent.style.pointerEvents = active ? 'none' : 'auto';
+          secCompletoContent.style.transform = active ? 'translateX(-40px)' : 'translateX(0)';
+          secCompletoContent.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+        }
+      }
+
+      toggleBoardBtn?.addEventListener('click', () => setBoardFreeView(true));
+      closeBoardBtn?.addEventListener('click', () => setBoardFreeView(false));
+      resetBoardBtn?.addEventListener('click', () => {
+        chess.boardInteraction?.resetPieces();
+        const desc = document.getElementById('board-hud-desc');
+        if (desc) desc.textContent = currentLang === 'es' ? 'Posición restablecida. Arrastra cualquier pieza para moverla.' : 'Position reset. Drag any piece to move it.';
+      });
 
       // Instanciar motor Three.js
       const params = new URLSearchParams(location.search);
@@ -669,6 +733,11 @@
             'Arquitectura sólida en la base, rigor científico en la diagonal, diseño versátil en el centro y liderazgo consciente en el núcleo. Has recorrido cada dimensión de mi trabajo; ahora que conoces mis piezas, <strong>¿iniciamos nuestra primera partida?</strong>',
           s8_tag: 'LUIS MONGE · CIENCIA DE DATOS · ARQUITECTURA IA · SOFTWARE',
           s8_cta: 'INICIAR CONVERSACIÓN',
+          s8_board_btn: '♟ EXPLORAR TABLERO 3D',
+          board_hud_title: 'MODO PARTIDA · TABLERO INTERACTIVO',
+          board_hud_desc: 'Arrastra cualquier pieza para moverla · Click derecho / arrastrar para rotar órbita 360°',
+          board_hud_reset: '↺ REINICIAR',
+          board_hud_close: '✕ CERRAR VISTA LIBRE',
           loader_label: 'CARGANDO TABLERO',
           loader_sub: 'OPTIMIZANDO PIEZAS & SHADERS',
         },
@@ -786,6 +855,11 @@
             'Solid architecture at the base, scientific rigor along the diagonal, versatile design at the center, and conscious leadership at the core. You have explored every dimension of my work; now that you know my pieces, <strong>shall we begin our first game?</strong>',
           s8_tag: 'LUIS MONGE · DATA SCIENCE · AI ARCHITECTURE · SOFTWARE',
           s8_cta: 'START A CONVERSATION',
+          s8_board_btn: '♟ EXPLORE 3D BOARD',
+          board_hud_title: 'MATCH MODE · INTERACTIVE BOARD',
+          board_hud_desc: 'Drag any piece to move it · Right-click / drag to rotate 360° orbit',
+          board_hud_reset: '↺ RESET',
+          board_hud_close: '✕ CLOSE FREE VIEW',
           loader_label: 'LOADING BOARD',
           loader_sub: 'OPTIMIZING PIECES & SHADERS',
         },
@@ -1586,6 +1660,122 @@
         text-transform: uppercase;
         color: #64748b;
         padding-top: 4px;
+      }
+
+      /* Estilos para el Tablero 3D Interactivo & HUD */
+      .final-actions-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .cta-board-btn {
+        background: rgba(56, 189, 248, 0.08);
+        border-color: rgba(56, 189, 248, 0.28);
+        color: #38bdf8;
+        cursor: pointer;
+      }
+
+      .cta-board-btn:hover {
+        background: rgba(56, 189, 248, 0.18);
+        border-color: rgba(56, 189, 248, 0.55);
+        box-shadow: 0 8px 24px rgba(56, 189, 248, 0.25);
+      }
+
+      .board-hud {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(40px);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 80;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+      }
+
+      .board-hud.active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .board-hud-panel {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: rgba(7, 9, 14, 0.88);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        padding: 12px 20px;
+        border-radius: 9999px;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(56, 189, 248, 0.15);
+      }
+
+      .board-hud-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .board-hud-icon {
+        font-size: 1.4rem;
+        color: #38bdf8;
+      }
+
+      .board-hud-texts {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .board-hud-title {
+        font-family: 'Inter', monospace;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: #38bdf8;
+      }
+
+      .board-hud-desc {
+        font-size: 0.74rem;
+        color: #cbd5e1;
+      }
+
+      .board-hud-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .hud-pill-btn {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #f1f5f9;
+        font-family: 'Inter', monospace;
+        font-size: 0.70rem;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 9999px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .hud-pill-btn:hover {
+        background: rgba(255, 255, 255, 0.14);
+        border-color: #38bdf8;
+        color: #ffffff;
+      }
+
+      .hud-pill-close {
+        background: rgba(239, 68, 68, 0.12);
+        border-color: rgba(239, 68, 68, 0.35);
+        color: #fca5a5;
+      }
+
+      .hud-pill-close:hover {
+        background: rgba(239, 68, 68, 0.25);
+        border-color: #ef4444;
+        color: #ffffff;
       }
 
       /* Botón CTA Sección Final */

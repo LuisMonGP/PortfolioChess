@@ -52,6 +52,15 @@ export function square(sq: string): [number, number] {
   return [(file - 3.5) * s, (3.5 - rank) * s];
 }
 
+/** Convierte coordenadas XZ sobre el tablero a notacion algebraica (`e4`) o null si esta fuera. */
+export function coordsToSquare(x: number, z: number): string | null {
+  const s = BOARD.square;
+  const file = Math.round(x / s + 3.5);
+  const rank = Math.round(3.5 - z / s);
+  if (file < 0 || file > 7 || rank < 0 || rank > 7) return null;
+  return String.fromCharCode(97 + file) + (rank + 1);
+}
+
 export interface PiecePlacement {
   id: string;
   kind: PieceKind;
