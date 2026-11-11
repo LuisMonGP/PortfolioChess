@@ -16,3 +16,6 @@ plan-camara-scroll.md
 CV_Luis_Monge.md
 .DS_Store
 Thumbs.db
+
+.agents/
+skills-lock.json
